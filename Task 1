@@ -1,0 +1,162 @@
+Task 1
+
+e-commerce database schema designed using PostgreSQl (pgAdmin) as part of SQL Developer Internship
+
+Project Objective: Learn to create databases, tables, and define relationships
+Deliverables: SQL script to create schema and Entity-Relationship Diagram
+
+Tables created
+Customers : Stores customer details like name, age, phone, email, address
+Products : Contains product details with prices and stock
+Orders - Hold each order placed by customers
+Order_items : Details of each product in every order
+Payments : Records how and when payments were made
+Shipping - Tracks order delivery and shipping status
+
+Here is the SQL queries execute in pgAdmin below:
+
+CREATE TABLE customers
+(
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    phone VARCHAR(10) CHECK (LENGTH(phone) = 10 AND phone NOT LIKE '%[^0-9]%'),
+    age INT NOT NULL,
+    landmark VARCHAR(50) NOT NULL,
+    city VARCHAR(50) NOT NULL,
+    pincode VARCHAR(50) NOT NULL,
+    state VARCHAR(50) NOT NULL
+);
+
+INSERT INTO customers VALUES
+(1, 'Rahul Kumar', 'rahul@gmail.com', '9876543210', 24, 'Near Metro Station', 'Hyderabad', '500081', 'Telangana'),
+(2, 'Anjali Reddy', 'anjali@gmail.com', '9876501234', 28, 'Beside Mall', 'Chennai', '600001', 'Tamil Nadu'),
+(3, 'Vikram Patel', 'vikram@gmail.com', '9876523456', 32, 'Opp SBI Bank', 'Ahmedabad', '380001', 'Gujarat'),
+(4, 'Neha Sharma', 'neha@gmail.com', '9876534567', 27, 'Next to Park', 'Bangalore', '560001', 'Karnataka'),
+(5, 'Ravi Teja', 'ravi@gmail.com', '9876547890', 30, 'Above Domino''s', 'Delhi', '110001', 'Delhi'),
+(6, 'Priya Singh', 'priya@gmail.com', '9876567890', 25, 'Behind Bus Stand', 'Pune', '411001', 'Maharashtra'),
+(7, 'Aditya Joshi', 'aditya@gmail.com', '9876577890', 26, 'Near Lake View', 'Mumbai', '400001', 'Maharashtra'),
+(8, 'Sneha Jain', 'sneha@gmail.com', '9876587890', 29, 'Close to Police Station', 'Kolkata', '700001', 'West Bengal'),
+(9, 'Manoj Das', 'manoj@gmail.com', '9876597890', 35, 'Opp Railway Station', 'Visakhapatnam', '530001', 'Andhra Pradesh'),
+(10, 'Divya Nair', 'divya@gmail.com', '9876607890', 31, 'Beside Apollo Hospital', 'Kochi', '682001', 'Kerala');
+
+CREATE TABLE products 
+(
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    stock INT NOT NULL,
+    category VARCHAR(50) NOT NULL
+);
+
+INSERT INTO products VALUES
+(101, 'Wireless Mouse', 499.00, 50, 'Electronics'),
+(102, 'Bluetooth Speaker', 999.00, 30, 'Electronics'),
+(103, 'Yoga Mat', 299.00, 100, 'Fitness'),
+(104, 'Mobile Charger', 299.00, 60, 'Electronics'),
+(105, 'Notebook Set', 199.00, 120, 'Stationery'),
+(106, 'Water Bottle', 149.00, 80, 'Home & Kitchen'),
+(107, 'T-shirt', 399.00, 70, 'Clothing'),
+(108, 'LED Bulb Pack', 349.00, 40, 'Home Essentials'),
+(109, 'Backpack', 799.00, 25, 'Bags'),
+(110, 'Headphones', 1199.00, 35, 'Electronics');
+
+CREATE TABLE orders 
+(
+    order_id INT PRIMARY KEY,
+    customer_id INT REFERENCES customers(customer_id),
+    order_date DATE NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL
+);
+
+INSERT INTO orders VALUES
+(1001, 1, '2025-06-20', 1498.00),
+(1002, 2, '2025-06-21', 299.00),
+(1003, 3, '2025-06-21', 799.00),
+(1004, 4, '2025-06-22', 399.00),
+(1005, 5, '2025-06-22', 698.00),
+(1006, 6, '2025-06-23', 149.00),
+(1007, 7, '2025-06-23', 349.00),
+(1008, 8, '2025-06-23', 999.00),
+(1009, 9, '2025-06-24', 599.00),
+(1010, 10, '2025-06-24', 1698.00);
+
+CREATE TABLE order_items 
+(
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES orders(order_id),
+    product_id INT REFERENCES products(product_id),
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL
+);
+
+INSERT INTO order_items (order_id, product_id, quantity, price) VALUES
+(1001, 101, 1, 499.00),
+(1001, 102, 1, 999.00),
+(1002, 103, 1, 299.00),
+(1003, 109, 1, 799.00),
+(1004, 107, 1, 399.00),
+(1005, 101, 1, 499.00),
+(1005, 104, 1, 199.00),
+(1006, 106, 1, 149.00),
+(1007, 108, 1, 349.00),
+(1008, 102, 1, 999.00);
+
+CREATE TABLE payments
+(
+    payment_id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES orders(order_id),
+    amount DECIMAL(10, 2) NOT NULL,
+    payment_date DATE NOT NULL,
+    method VARCHAR(50) NOT NULL
+);
+
+INSERT INTO payments (order_id, amount, payment_date, method) VALUES
+(1001, 1498.00, '2025-06-20', 'UPI'),
+(1002, 299.00, '2025-06-21', 'Credit Card'),
+(1003, 799.00, '2025-06-21', 'Debit Card'),
+(1004, 399.00, '2025-06-22', 'Net Banking'),
+(1005, 698.00, '2025-06-22', 'UPI'),
+(1006, 149.00, '2025-06-23', 'Cash on Delivery'),
+(1007, 349.00, '2025-06-23', 'UPI'),
+(1008, 999.00, '2025-06-23', 'Credit Card'),
+(1009, 599.00, '2025-06-24', 'Debit Card'),
+(1010, 1698.00, '2025-06-24', 'UPI');
+
+CREATE TABLE shipping
+(
+    shipping_id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES orders(order_id),
+    courier VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    expected_date DATE NOT NULL
+);
+
+INSERT INTO shipping (order_id, courier, status, expected_date) VALUES
+(1001, 'BlueDart', 'Shipped', '2025-06-25'),
+(1002, 'Delhivery', 'Delivered', '2025-06-22'),
+(1003, 'Ecom Express', 'In Transit', '2025-06-25'),
+(1004, 'DTDC', 'Delivered', '2025-06-23'),
+(1005, 'BlueDart', 'Shipped', '2025-06-26'),
+(1006, 'XpressBees', 'Out for Delivery', '2025-06-24'),
+(1007, 'Delhivery', 'Delivered', '2025-06-24'),
+(1008, 'DTDC', 'Shipped', '2025-06-26'),
+(1009, 'BlueDart', 'In Transit', '2025-06-27'),
+(1010, 'Ecom Express', 'Shipped', '2025-06-27');
+
+Technologies used
+
+Database: PostgreSQL using pgAdmin
+Language : SQL (DDL and DML)
+Platform : pgAdmin 4
+
+features in the queries
+
+1. Defined primary and foreign key relationship
+2. Check constraints for phone number format
+
+Author
+Uma Sankar Rao bellamkonda
+
+
+
